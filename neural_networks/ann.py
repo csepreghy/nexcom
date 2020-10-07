@@ -24,13 +24,17 @@ class ANN():
         self.enc.fit(y_train)
 
         y_train = self.enc.transform(y_train)
+        y_test = self.enc.transform(y_test)
 
+        print(X_train.shape)
+        print(X_test.shape)
+        print(y_train.shape)
+        print(y_test.shape)
 
-        print('y_train', y_train.shape)
         # print(self.enc.categories_)
         
-        self.n_
-
+        self.n_labels = y_train.shape[1]
+        print(f'Number of labels: {self.n_labels}')
 
         return X_train, X_test, y_train, y_test
 
@@ -49,11 +53,12 @@ class ANN():
                         config.kernel_size,
                         padding='valid',
                         activation='relu'))
+
         model.add(MaxPooling1D())
         model.add(Flatten())
         model.add(Dense(config.hidden_dims, activation='relu'))
         model.add(Dropout(0.5))
-        model.add(Dense(1, activation='sigmoid'))
+        model.add(Dense(self.n_labels, activation='sigmoid'))
 
         return model
     
@@ -62,7 +67,8 @@ class ANN():
         model = self._build_model(self.config)
         # print(model.summary())
 
-        model.compile(loss='binary_crossentropy',
+        # sparse_categorical_crossentropy
+        model.compile(loss='categorical_crossentropy',
               optimizer='adam',
               metrics=['accuracy'])
 
