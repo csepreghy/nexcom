@@ -1,4 +1,9 @@
+import numpy as np
+import pandas as pd
+
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
+
 from tensorflow.keras.preprocessing import sequence
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation
@@ -6,14 +11,28 @@ from tensorflow.keras.layers import Embedding, LSTM
 from tensorflow.keras.layers import Conv1D, Flatten, MaxPooling1D
 
 class ANN():
-    def __init__(self, data, config):
-        self._prepare_data(data)
+    def __init__(self, config):
+        self.config = config
 
     def _prepare_data(self, data):
         X = data['Subject']
-        y = data['Tray']
+        y = np.array(data['Tray']).reshape(-1, 1)
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+        
+        self.enc = OneHotEncoder(handle_unknown='ignore')
+        self.enc.fit(y_train)
+
+        y_train = self.enc.transform(y_train)
+
+
+        print('y_train', y_train.shape)
+        # print(self.enc.categories_)
+        
+        self.n_
+
+
+        return X_train, X_test, y_train, y_test
 
     def _build_model(self, config):
         model = Sequential()
@@ -38,6 +57,16 @@ class ANN():
 
         return model
     
-    def fit(self, config):
-        model = self._build_model(config)
+    def fit(self, data):
+        X_train, X_test, y_train, y_test = self._prepare_data(data)
+        model = self._build_model(self.config)
+        # print(model.summary())
 
+        model.compile(loss='binary_crossentropy',
+              optimizer='adam',
+              metrics=['accuracy'])
+
+        model.fit(X_train, y_train,
+                  batch_size=self.config.batch_size,
+                  epochs=self.config.epochs,
+                  validation_data=(X_test, y_test), callbacks=[])
