@@ -1,5 +1,6 @@
-from preprocessing import load_text
+from preprocessing import load_text, run_preprocessing
 
 
 if __name__ == '__main__':
-    filenames = load_text()
+    df = load_text()
+    processed = run_preprocessing(df)
