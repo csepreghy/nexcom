@@ -1,12 +1,9 @@
 from os import listdir
 from os.path import isfile, join
+import pandas as pd
 
 def load_text():
-    mypath = 'data/bbc'
-    filenames = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+    df_raw_data = pd.read_csv('data/Exercise STUDENT Training dataset - 1X IRI 7 Oct 20.csv')
+    print(f'{df_raw_data}')
 
-    # for f in files:
-    #     with open(f, 'r') as reader:
-    #         print(reader.read())
-
-    return filenames
+    return 0
