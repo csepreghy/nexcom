@@ -1,11 +1,8 @@
 from os import listdir
 from os.path import isfile, join
 import pandas as pd
-from sklearn.model_selection import train_test_split
 import string
 import re
-
-import preprocessing.config as config
 
 def load_text():
     df_raw_data = pd.read_csv('data/Exercise STUDENT Training dataset - 1X IRI 7 Oct 20.csv')
@@ -31,6 +28,3 @@ def run_preprocessing(df):
     n_empty_subjects = count_empty_subjects(df)
     print(n_empty_subjects)
     
-    # print(subjects[124] == '  ')
-    
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
