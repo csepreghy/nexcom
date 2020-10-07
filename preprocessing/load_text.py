@@ -13,9 +13,6 @@ def load_text():
 def count_empty_subjects(df):
     total = 0
     for subject in df['Subject']:
-        # nospace = str(subject).replace(' ', '')
-        # nospace = ''.join(str(subject).split())
-        
         nospace = re.sub(r'(\s|\u180B|\u200B|\u200C|\u200D|\u2060|\uFEFF)+', '', str(subject))
 
         if len(nospace) == 0 or nospace == 'nan':
