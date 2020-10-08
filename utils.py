@@ -25,11 +25,9 @@ def evaluate_model(model, X_train, y_train, X_test, y_test):
     # recall = recall_score(y_test, y_pred), average='weighted'
     # f1 = f1_score(y_test, y_pred, average='micro')
 
-    with open('logs/classification_report.txt') as f:
+    with open('logs/classification_report.txt', mode='w') as f:
         print(classification_report(y_test, y_pred, digits=3), file=f)
     
-
-    print('recall: ', )
-    print('precision: ')
+    print(classification_report(y_test, y_pred, digits=3))
     print(f'train: {train_acc}')
     print(f'test: {test_acc}')
