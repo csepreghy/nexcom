@@ -10,9 +10,9 @@ def evaluate_model(model, X_train, y_train, X_test, y_test):
     print('Train: %.3f, Test: %.3f' % (train_acc, test_acc))
 
     y_pred = model.predict(X_test)
-    y_pred = tf.one_hot(tf.math.argmax(y_test, axis=1), depth=y_pred.shape[1], labels=np.unique(y_pred))
+    y_pred = tf.one_hot(tf.math.argmax(y_test, axis=1), depth=y_pred.shape[1])
 
-    f1 = f1_score(y_test, y_pred, average='weighted')
+    f1 = f1_score(y_test, y_pred, average='weighted', labels=np.unique(y_pred))
 
     print(f'Weighted f1 score: {f1}')
 
