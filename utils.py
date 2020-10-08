@@ -1,19 +1,35 @@
 import numpy as np
 import tensorflow as tf
 
-from sklearn.metrics import f1_score
+from sklearn.metrics import f1_score, recall_score, precision_score, classification_report
+
+def shuffle_in_unison(a, b):
+    print(f'a.shape = {a.shape}')
+    print(f'b.shape = {b.shape}')
+
+    rng_state = np.random.get_state()
+    np.random.shuffle(a)
+    np.random.set_state(rng_state)
+    np.random.shuffle(b)
+    return a, b
 
 def evaluate_model(model, X_train, y_train, X_test, y_test):
     _, train_acc = model.evaluate(X_train, y_train)
     _, test_acc = model.evaluate(X_test, y_test)
 
-    print('Train: %.3f, Test: %.3f' % (train_acc, test_acc))
 
     y_pred = model.predict(X_test)
     y_pred = tf.one_hot(tf.math.argmax(y_test, axis=1), depth=y_pred.shape[1])
 
-    f1 = f1_score(y_test, y_pred, average='weighted', labels=np.unique(y_pred))
+    # precision = precision_score(y_test, y_pred), average='weighted')
+    # recall = recall_score(y_test, y_pred), average='weighted'
+    # f1 = f1_score(y_test, y_pred, average='micro')
 
-    print(f'Weighted f1 score: {f1}')
+    with open('logs/classification_report.txt') as f:
+        print(classification_report(y_test, y_pred, digits=3), file=f)
+    
 
-    return train_acc, test_acc, f1
+    print('recall: ', )
+    print('precision: ')
+    print(f'train: {train_acc}')
+    print(f'test: {test_acc}')

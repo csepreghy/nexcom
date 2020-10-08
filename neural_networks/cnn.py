@@ -11,7 +11,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers import Embedding, LSTM, Conv1D, Flatten, MaxPooling1D, Dense, Dropout, Activation
 from tensorflow.keras.callbacks import History, TensorBoard, EarlyStopping, ModelCheckpoint
 
-class ANN():
+class CNN():
     def __init__(self, config):
         self.config = config
 
@@ -73,7 +73,9 @@ class ANN():
         model.add(Dropout(0.5))
 
         model.add(Dense(self.n_labels, activation='softmax'))
-        model.compile(loss='categorical_crossentropy', optimizer=Adam(0.0001), metrics=['accuracy'])
+        model.compile(loss=config.lossfunc, optimizer=Adam(0.0001), metrics=['accuracy'])
+
+        # print(model.summary())
 
         return model
     
@@ -85,19 +87,16 @@ class ANN():
                                           save_best_only=True)
         
         return [tensorboard, earlystopping, modelcheckpoint]
-    
+
     def fit(self, X_train, X_test, X_val, y_train, y_test, y_val):
-        
         model = self._build_model(self.config)
-        # print(model.summary())
 
         callbacks = self._get_callbacks()
 
-        # sparse_categorical_crossentropy
-        model.fit(X_train, y_train,
-                  batch_size=self.config.batch_size,
-                  epochs=self.config.epochs,
-                  validation_data=(X_val, y_val), callbacks=[callbacks])
+        history = model.fit(X_train, y_train,
+                            batch_size=self.config.batch_size,
+                            epochs=self.config.epochs,
+                            validation_data=(X_val, y_val), callbacks=[callbacks])
 
         return model
         
