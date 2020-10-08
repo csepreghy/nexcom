@@ -15,7 +15,7 @@ class ANN():
     def __init__(self, config):
         self.config = config
 
-    def _prepare_data(self, data):
+    def prepare_data(self, data):
         X = data['Subject']
         y = np.array(data['Tray']).reshape(-1, 1)
 
@@ -48,16 +48,6 @@ class ANN():
         X_train = np.expand_dims(X_train, axis=2)
         X_test = np.expand_dims(X_test, axis=2)
         X_val = np.expand_dims(X_val, axis=2)
-
-
-        # y_train = np.zeros(y_train.shape[0])
-        # y_test = np.zeros(y_test.shape[0])
-        # y_val = np.zeros(y_val.shape[0])
-
-        print('X_train', X_train)
-        print('X_train shape', X_train.shape)
-        print('y_train shape', y_train.shape)
-        print(f'y_train = {y_train}')
 
         return X_train, X_test, X_val, y_train, y_test, y_val
 
@@ -96,8 +86,8 @@ class ANN():
         
         return [tensorboard, earlystopping, modelcheckpoint]
     
-    def fit(self, data):
-        X_train, X_test, X_val, y_train, y_test, y_val = self._prepare_data(data)
+    def fit(self, X_train, X_test, X_val, y_train, y_test, y_val):
+        
         model = self._build_model(self.config)
         # print(model.summary())
 
@@ -107,4 +97,7 @@ class ANN():
         model.fit(X_train, y_train,
                   batch_size=self.config.batch_size,
                   epochs=self.config.epochs,
-                  validation_data=(X_val, y_val), callbacks=[])
+                  validation_data=(X_val, y_val), callbacks=[callbacks])
+
+        return model
+        
