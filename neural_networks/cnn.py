@@ -81,7 +81,7 @@ class CNN():
     
     def _get_callbacks(self):
         tensorboard = TensorBoard(log_dir='logs/{}'.format('cnn-{}'.format(time.time())))
-        earlystopping = EarlyStopping(monitor='val_accuracy', patience=5)
+        earlystopping = EarlyStopping(monitor='accuracy', patience=10)
         modelcheckpoint = ModelCheckpoint(filepath='logs/model/cnn.epoch{epoch:02d}-val_loss_{val_loss:.2f}.h5',
                                           monitor='val_loss',
                                           save_best_only=True)
