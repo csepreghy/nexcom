@@ -1,7 +1,7 @@
 import config
 from neural_networks.cnn import CNN
 from preprocessing import load_text, run_preprocessing
-from utils import evaluate_model
+from neural_networks.utils import evaluate_model
 
 if __name__ == '__main__':
     df = load_text(max_len=-1)

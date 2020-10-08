@@ -12,6 +12,8 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers import Embedding, LSTM, Conv1D, Flatten, MaxPooling1D, Dense, Dropout, Activation
 from tensorflow.keras.callbacks import History, TensorBoard, EarlyStopping, ModelCheckpoint
 
+from .utils import shuffle_in_unison
+
 class CNN():
     def __init__(self, config):
         self.config = config
@@ -19,6 +21,10 @@ class CNN():
     def prepare_data(self, data):
         X = data['Subject']
         y = np.array(data['Tray']).reshape(-1, 1)
+
+        print(f'X[0:5] = {X[0:5]}')
+        X, y = shuffle_in_unison(X, y)
+        print(f'X[0:5] = {X[0:5]}')
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2)
