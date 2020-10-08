@@ -80,11 +80,11 @@ class CNN():
 
         return model
     
-    def _get_callbacks(self):
-        current_time = datetime.datetime.now() 
-        tensorboard = TensorBoard(log_dir='logs/{}'.format('cnn-{}'.format(datetime.datetime.now())))
+    def _get_callbacks(self, config):
+        now = datetime.datetime.now()
+        tensorboard = TensorBoard(log_dir=f'{config.logpath}/cnn-{now}')
         earlystopping = EarlyStopping(monitor='accuracy', patience=10)
-        modelcheckpoint = ModelCheckpoint(filepath='logs/model/cnn.epoch{epoch:02d}-val_loss_{val_loss:.2f}.h5',
+        modelcheckpoint = ModelCheckpoint(filepath=f'{config.logpath}' + '/model/cnn.epoch{epoch:02d}-val_loss_{val_loss:.2f}.h5',
                                           monitor='val_loss',
                                           save_best_only=True)
         
@@ -93,7 +93,7 @@ class CNN():
     def fit(self, X_train, X_test, X_val, y_train, y_test, y_val):
         model = self._build_model(self.config)
 
-        callbacks = self._get_callbacks()
+        callbacks = self._get_callbacks(self.config)
 
         history = model.fit(X_train, y_train,
                             batch_size=self.config.batch_size,
