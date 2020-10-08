@@ -5,7 +5,7 @@ import string
 import re
 
 def load_text(max_len):
-    df_raw_data = pd.read_csv('data/Exercise STUDENT Training dataset - 1X IRI 7 Oct 20.csv').head(max_len)
+    df_raw_data = pd.read_csv('data/Exercise STUDENT Training dataset - 1X IRI 7 Oct 20.csv').head(max_len).astype(str)
     print(f'{df_raw_data}')
 
     return df_raw_data
