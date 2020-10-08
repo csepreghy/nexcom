@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import time
+import datetime
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -80,7 +81,8 @@ class CNN():
         return model
     
     def _get_callbacks(self):
-        tensorboard = TensorBoard(log_dir='logs/{}'.format('cnn-{}'.format(time.time())))
+        current_time = datetime.datetime.now() 
+        tensorboard = TensorBoard(log_dir='logs/{}'.format('cnn-{}'.format(datetime.datetime.now())))
         earlystopping = EarlyStopping(monitor='accuracy', patience=10)
         modelcheckpoint = ModelCheckpoint(filepath='logs/model/cnn.epoch{epoch:02d}-val_loss_{val_loss:.2f}.h5',
                                           monitor='val_loss',
