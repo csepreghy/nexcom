@@ -7,3 +7,4 @@ kernel_size = 3
 lossfunc = 'categorical_crossentropy'
 logpath = 'logs'
 epochs = 2
+lstm_gpu = False

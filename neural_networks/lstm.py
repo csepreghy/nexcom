@@ -9,7 +9,16 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from tensorflow.keras.preprocessing import sequence, text
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.layers import Embedding, Conv1D, Flatten, MaxPooling1D, Dense, Dropout, Activation, TimeDistributed, SpatialDropout1D, LSTM
+from tensorflow.keras.layers import (Embedding,
+                                     Conv1D,
+                                     Flatten,
+                                     MaxPooling1D,
+                                     Dense,
+                                     Dropout,
+                                     Activation,
+                                     SpatialDropout1D,
+                                     LSTM,
+                                     CuDNNLSTM)
 from tensorflow.keras import layers
 from tensorflow.keras.callbacks import History, TensorBoard, EarlyStopping, ModelCheckpoint
 
@@ -61,11 +70,27 @@ class LongShortTermMemory():
 
         return X_train, X_test, X_val, y_train, y_test, y_val
 
-    def _build_model(self, config):
+    def _build_cpu_model(self, config):
         model = Sequential()
         model.add(Embedding(config.maxlen, config.embedding_dims, input_length=config.maxlen))
         model.add(SpatialDropout1D(0.2))
         model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
+        model.add(Dense(self.n_labels, activation='softmax'))
+        
+        model.compile(loss=config.lossfunc, optimizer=Adam(0.0001), metrics=['accuracy'])
+        print(model.summary())
+
+        return model
+
+    def _build_gpu_model(self, config):
+        model = Sequential()
+        model.add(Embedding(config.maxlen, config.embedding_dims, input_length=config.maxlen))
+        model.add(SpatialDropout1D(0.2))
+        model.add(CuDNNLSTM(128)) # recurrent_dropout=0.2
+        model.add(Dropout(0.2))
+        model.add(CuDNNLSTM(128))
+        model.add(Dropout(0.2))
+
         model.add(Dense(self.n_labels, activation='softmax'))
         
         model.compile(loss=config.lossfunc, optimizer=Adam(0.0001), metrics=['accuracy'])
