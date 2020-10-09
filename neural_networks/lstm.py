@@ -17,8 +17,9 @@ from tensorflow.keras.layers import (Embedding,
                                      Dropout,
                                      Activation,
                                      SpatialDropout1D,
-                                     LSTM,
-                                     CuDNNLSTM)
+                                     LSTM)
+
+from keras.layers import CuDNNLSTM
 from tensorflow.keras import layers
 from tensorflow.keras.callbacks import History, TensorBoard, EarlyStopping, ModelCheckpoint
 
