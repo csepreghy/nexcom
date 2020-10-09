@@ -109,7 +109,8 @@ class LongShortTermMemory():
         return [tensorboard, earlystopping, modelcheckpoint]
 
     def fit(self, X_train, X_test, X_val, y_train, y_test, y_val):
-        model = self._build_model(self.config)
+        if self.config.lstm_gpu == False: model = self._build_cpu_model(self.config)
+        if self.config.lstm_gpu == True: model = self._build_gpu_model(self.config)
 
         callbacks = self._get_callbacks(self.config)
         print(X_train.shape)
