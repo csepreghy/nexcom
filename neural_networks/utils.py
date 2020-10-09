@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import pickle
 
 from sklearn.metrics import f1_score, recall_score, precision_score, classification_report
 
@@ -31,3 +32,13 @@ def evaluate_model(model, X_train, y_train, X_test, y_test):
     # print(classification_report(y_test, y_pred, digits=3))
     print(f'train: {train_acc}')
     print(f'test: {test_acc}')
+
+def save_accuracies(history):
+    with open('cnn_accuracies.pkl', 'wb') as f:
+        accuracies = history.history['accuracy']
+        print(f'accuracies : {accuracies}')
+        pickle.dump(history.history['accuracy'], f)
+        
+    with open ('cnn_accuracies.pkl', 'rb') as f:
+        accuracies = pickle.load(f)
+        print(f'accuracies : {accuracies}')
