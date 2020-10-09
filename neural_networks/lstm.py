@@ -90,7 +90,7 @@ class LongShortTermMemory():
                                           monitor='val_loss',
                                           save_best_only=True)
         
-        return [tensorboard, earlystopping, modelcheckpoint]
+        return [earlystopping, modelcheckpoint]
 
     def fit(self, X_train, X_test, X_val, y_train, y_test, y_val):
         model = self._build_model(self.config)
