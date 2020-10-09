@@ -37,7 +37,7 @@ class LongShortTermMemory():
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2)
 
-        tokenizer = text.Tokenizer(num_words=self.config.vocab_size)
+        tokenizer = text.Tokenizer(num_words=self.config.maxlen)
         tokenizer.fit_on_texts(X_train)
 
         word_index = tokenizer.word_index
@@ -70,27 +70,11 @@ class LongShortTermMemory():
 
         return X_train, X_test, X_val, y_train, y_test, y_val
 
-    def _build_cpu_model(self, config):
+    def _build_model(self, config):
         model = Sequential()
         model.add(Embedding(config.maxlen, config.embedding_dims, input_length=config.maxlen))
         model.add(SpatialDropout1D(0.2))
         model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
-        model.add(Dense(self.n_labels, activation='softmax'))
-        
-        model.compile(loss=config.lossfunc, optimizer=Adam(0.0001), metrics=['accuracy'])
-        print(model.summary())
-
-        return model
-
-    def _build_gpu_model(self, config):
-        model = Sequential()
-        model.add(Embedding(config.maxlen, config.embedding_dims, input_length=config.maxlen))
-        model.add(SpatialDropout1D(0.2))
-        model.add(CuDNNLSTM(128)) # recurrent_dropout=0.2
-        model.add(Dropout(0.2))
-        model.add(CuDNNLSTM(128))
-        model.add(Dropout(0.2))
-
         model.add(Dense(self.n_labels, activation='softmax'))
         
         model.compile(loss=config.lossfunc, optimizer=Adam(0.0001), metrics=['accuracy'])
@@ -109,12 +93,9 @@ class LongShortTermMemory():
         return [tensorboard, earlystopping, modelcheckpoint]
 
     def fit(self, X_train, X_test, X_val, y_train, y_test, y_val):
-        if self.config.lstm_gpu == False: model = self._build_cpu_model(self.config)
-        if self.config.lstm_gpu == True: model = self._build_gpu_model(self.config)
+        self._build_model(self.config)
 
         callbacks = self._get_callbacks(self.config)
-        print(X_train.shape)
-        print(X_train[0].shape)
 
         history = model.fit(X_train, y_train,
                             batch_size=self.config.batch_size,

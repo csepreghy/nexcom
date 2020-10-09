@@ -1,6 +1,6 @@
 vocab_size = 1000
-maxlen = 1000
-batch_size = 32
+maxlen = 250
+batch_size = 64
 embedding_dims = 100
 filters = 16
 kernel_size = 3
