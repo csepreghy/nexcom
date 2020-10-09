@@ -100,7 +100,7 @@ class LongShortTermMemory():
         history = model.fit(X_train, y_train,
                             batch_size=self.config.batch_size,
                             epochs=self.config.epochs,
-                            validation_data=(X_val, y_val),
+                            validation_split=0.2,
                             callbacks=[callbacks])
 
         return model

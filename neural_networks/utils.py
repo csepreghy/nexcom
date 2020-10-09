@@ -28,6 +28,6 @@ def evaluate_model(model, X_train, y_train, X_test, y_test):
     with open('logs/classification_report.txt', mode='w') as f:
         print(classification_report(y_test, y_pred, digits=3), file=f)
     
-    print(classification_report(y_test, y_pred, digits=3))
+    # print(classification_report(y_test, y_pred, digits=3))
     print(f'train: {train_acc}')
     print(f'test: {test_acc}')
