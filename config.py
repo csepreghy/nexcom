@@ -1,10 +1,10 @@
-vocab_size = 1000
-maxlen = 100
-batch_size = 64
+vocab_size = 200
+maxlen = 200
+batch_size = 32
 embedding_dims = 100
 filters = 16
 kernel_size = 3
 lossfunc = 'categorical_crossentropy'
 logpath = 'logs'
-epochs = 2
+epochs = 10
 lstm_gpu = False

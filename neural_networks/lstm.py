@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import time
 import datetime
+import pickle
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -102,6 +103,15 @@ class LongShortTermMemory():
                             epochs=self.config.epochs,
                             validation_split=0.2,
                             callbacks=[callbacks])
+        
+        with open('lstm_accuracies.pkl', 'wb') as f:
+            accuracies = history.history['accuracy']
+            print(f'accuracies : {accuracies}')
+            pickle.dump(history.history['accuracy'], f)
+        
+        with open ('lstm_accuracies.pkl', 'rb') as f:
+            accuracies = pickle.load(f)
+            print(f'accuracies : {accuracies}')
 
         return model
         

@@ -18,6 +18,6 @@ def run_lstm(df):
 
 if __name__ == '__main__':
     df = load_text(max_len=-1)
-    # run_cnn(df)
-    run_lstm(df)
+    run_cnn(df)
+    # run_lstm(df)
     

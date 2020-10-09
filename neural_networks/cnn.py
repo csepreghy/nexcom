@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import time
 import datetime
+import pickle
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -88,13 +89,12 @@ class CNN():
     
     def _get_callbacks(self, config):
         now = datetime.datetime.now()
-        tensorboard = TensorBoard(log_dir=f'{config.logpath}/cnn-{now}')
-        earlystopping = EarlyStopping(monitor='accuracy', patience=10)
+        earlystopping = EarlyStopping(monitor='accuracy', patience=15)
         modelcheckpoint = ModelCheckpoint(filepath=f'{config.logpath}' + '/model/cnn.epoch{epoch:02d}-val_loss_{val_loss:.2f}.h5',
                                           monitor='val_loss',
                                           save_best_only=True)
         
-        return [tensorboard, earlystopping, modelcheckpoint]
+        return [earlystopping, modelcheckpoint]
 
     def fit(self, X_train, X_test, X_val, y_train, y_test, y_val):
         model = self._build_model(self.config)
@@ -105,6 +105,15 @@ class CNN():
                             batch_size=self.config.batch_size,
                             epochs=self.config.epochs,
                             validation_data=(X_val, y_val), callbacks=[callbacks])
+        
+        with open('cnn_accuracies.pkl', 'wb') as f:
+            accuracies = history.history['accuracy']
+            print(f'accuracies : {accuracies}')
+            pickle.dump(history.history['accuracy'], f)
+        
+        with open ('cnn_accuracies.pkl', 'rb') as f:
+            accuracies = pickle.load(f)
+            print(f'accuracies : {accuracies}')
 
         return model
         
