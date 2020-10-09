@@ -5,10 +5,11 @@ import string
 import re
 
 def load_text(max_len):
-    df_raw_data = pd.read_csv('data/Exercise STUDENT Training dataset - 1X IRI 7 Oct 20.csv').head(max_len).astype(str)
-    print(f'{df_raw_data}')
+    df = pd.read_csv('data/Exercise STUDENT Training dataset - 1X IRI 7 Oct 20.csv').head(max_len).astype(str)
+    print(f'{df}')
+    print(df.Tray.value_counts())
 
-    return df_raw_data
+    return df
 
 def count_empty_subjects(df):
     total = 0
@@ -19,6 +20,13 @@ def count_empty_subjects(df):
             total+=1
 
     return total
+
+
+def print_plot(df, index):
+    example = df[df.index == index][['Subject', 'Tray']].values[0]
+    if len(example) > 0:
+        print(example[0])
+        print('Tray:', example[1])
 
 def run_preprocessing(df):
     subjects = df['Subject']

@@ -11,7 +11,7 @@ def shuffle_in_unison(a, b):
     np.random.shuffle(a)
     np.random.set_state(rng_state)
     np.random.shuffle(b)
-    return a, b
+    return np.array(a), np.array(b)
 
 def evaluate_model(model, X_train, y_train, X_test, y_test):
     _, train_acc = model.evaluate(X_train, y_train)

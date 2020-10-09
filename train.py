@@ -1,6 +1,6 @@
 import config
 from neural_networks.cnn import CNN
-from neural_networks.lstm import LSTM
+from neural_networks.lstm import LongShortTermMemory
 from preprocessing import load_text, run_preprocessing
 from neural_networks.utils import evaluate_model
 
@@ -11,7 +11,7 @@ def run_cnn(df):
     evaluate_model(model, X_train, y_train, X_test, y_test)
 
 def run_lstm(df):
-    lstm = LSTM(config)
+    lstm = LongShortTermMemory(config)
     X_train, X_test, X_val, y_train, y_test, y_val = lstm.prepare_data(df)
     model = lstm.fit(X_train, X_test, X_val, y_train, y_test, y_val)
     evaluate_model(model, X_train, y_train, X_test, y_test)

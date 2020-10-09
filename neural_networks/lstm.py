@@ -9,13 +9,13 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from tensorflow.keras.preprocessing import sequence, text
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.layers import Embedding, Conv1D, Flatten, MaxPooling1D, Dense, Dropout, Activation, TimeDistributed
+from tensorflow.keras.layers import Embedding, Conv1D, Flatten, MaxPooling1D, Dense, Dropout, Activation, TimeDistributed, SpatialDropout1D, LSTM
 from tensorflow.keras import layers
 from tensorflow.keras.callbacks import History, TensorBoard, EarlyStopping, ModelCheckpoint
 
 from .utils import shuffle_in_unison
 
-class LSTM():
+class LongShortTermMemory():
     def __init__(self, config):
         self.config = config
 
@@ -31,14 +31,19 @@ class LSTM():
         tokenizer = text.Tokenizer(num_words=self.config.vocab_size)
         tokenizer.fit_on_texts(X_train)
 
-        X_train = tokenizer.texts_to_matrix(X_train)
-        X_test = tokenizer.texts_to_matrix(X_test)
-        X_val = tokenizer.texts_to_matrix(X_val)
+        word_index = tokenizer.word_index
+        print('Found %s unique tokens.' % len(word_index))
+
+        X_train = tokenizer.texts_to_sequences(X_train)
+        X_test = tokenizer.texts_to_sequences(X_test)
+        X_val = tokenizer.texts_to_sequences(X_val)
 
         X_train = sequence.pad_sequences(X_train, maxlen=self.config.maxlen)
         X_test = sequence.pad_sequences(X_test, maxlen=self.config.maxlen)
         X_val = sequence.pad_sequences(X_val, maxlen=self.config.maxlen)
         
+        print('Shape of data tensor:', X_train.shape)
+
         self.enc = OneHotEncoder(handle_unknown='ignore')
         self.enc.fit(y_train)
 
@@ -51,25 +56,20 @@ class LSTM():
         self.n_labels = y_train.shape[1]
         print(f'Number of labels: {self.n_labels}')
 
-        X_train = np.expand_dims(X_train, axis=2)
-        X_test = np.expand_dims(X_test, axis=2)
-        X_val = np.expand_dims(X_val, axis=2)
+        print(f'X_train: {X_train.shape}, y_train: {y_train.shape}')
+        print(f'X_test: {X_test.shape}, y_test: {y_test.shape}')
 
         return X_train, X_test, X_val, y_train, y_test, y_val
 
     def _build_model(self, config):
         model = Sequential()
-        model.add(Embedding(config.vocab_size, 128, input_length=config.maxlen))
-        model.add(layers.LSTM(128, return_sequences=True))
-        model.add(layers.LSTM(128, return_sequences=True))
-
-        model.add(Dropout(0.5))
-        model.add(TimeDistributed(Dense(config.vocab_size)))
-        model.add(Activation('softmax'))
-
-        optimizer = Adam()
-        model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['categorical_accuracy'])
-        # print(model.summary())
+        model.add(Embedding(config.maxlen, config.embedding_dims, input_length=config.maxlen))
+        model.add(SpatialDropout1D(0.2))
+        model.add(LSTM(100, dropout=0.2, recurrent_dropout=0.2))
+        model.add(Dense(self.n_labels, activation='softmax'))
+        
+        model.compile(loss=config.lossfunc, optimizer=Adam(0.0001), metrics=['accuracy'])
+        print(model.summary())
 
         return model
     
@@ -87,11 +87,14 @@ class LSTM():
         model = self._build_model(self.config)
 
         callbacks = self._get_callbacks(self.config)
+        print(X_train.shape)
+        print(X_train[0].shape)
 
         history = model.fit(X_train, y_train,
                             batch_size=self.config.batch_size,
                             epochs=self.config.epochs,
-                            validation_data=(X_val, y_val), callbacks=[callbacks])
+                            validation_data=(X_val, y_val),
+                            callbacks=[callbacks])
 
         return model
         
