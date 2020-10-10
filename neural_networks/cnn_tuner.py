@@ -12,7 +12,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.layers import Embedding, LSTM, Conv1D, Flatten, MaxPooling1D, Dense, Dropout, Activation
 from tensorflow.keras.callbacks import History, TensorBoard, EarlyStopping, ModelCheckpoint
-import kerastuner as kt
+from kerastuner.tuners import RandomSearch
 import tensorflow as tf
 
 from .utils import shuffle_in_unison, save_accuracies
@@ -89,17 +89,18 @@ class CNNTuner():
         return model
     
     def fit(self, X_train, X_test, X_val, y_train, y_test, y_val):
-        tuner = kt.Hyperband(self._build_model,
+        tuner = RandomSearch(self._build_model,
                              objective='val_accuracy',
-                             max_epochs=30,
-                             hyperband_iterations=2,
+                             max_trials=20,
+                             executions_per_trial=1,
+                             directory='logs/keras-tuner/',
                              project_name='cnn-tuner')
-        
+
         tuner.search_space_summary()
     
         tuner.search(x=X_train,
                      y=y_train,
-                     epochs=40,
+                     epochs=self.config.epochs,
                      batch_size=self.config.batch_size,
                      verbose=0,
                      validation_data=(X_val, y_val),
