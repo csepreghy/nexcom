@@ -26,6 +26,6 @@ def run_cnn_tuner(df):
 if __name__ == '__main__':
     df = load_text(max_len=-1)
     # run_cnn(df)
-    run_cnn_tuner(df)
-    # run_lstm(df)
+    # run_cnn_tuner(df)
+    run_lstm(df)
     

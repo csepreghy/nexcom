@@ -75,9 +75,9 @@ class LongShortTermMemory():
         model = Sequential()
         model.add(Embedding(config.maxlen, config.embedding_dims, input_length=config.maxlen))
         model.add(SpatialDropout1D(0.2))
-        model.add(LSTM(128))
+        model.add(LSTM(100, dropout=0.2, return_sequences=True))
         model.add(Dropout(0.2))
-        model.add(LSTM(128))
+        model.add(LSTM(100, dropout=0.2, return_sequences=False))
         model.add(Dropout(0.2))
         model.add(Dense(self.n_labels, activation='softmax'))
         
