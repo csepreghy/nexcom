@@ -33,9 +33,9 @@ class CNN():
         tokenizer = text.Tokenizer(num_words=self.config.vocab_size)
         tokenizer.fit_on_texts(X_train)
 
-        X_train = tokenizer.texts_to_matrix(X_train)
-        X_test = tokenizer.texts_to_matrix(X_test)
-        X_val = tokenizer.texts_to_matrix(X_val)
+        X_train = tokenizer.texts_to_sequences(X_train)
+        X_test = tokenizer.texts_to_sequences(X_test)
+        X_val = tokenizer.texts_to_sequences(X_val)
 
         X_train = sequence.pad_sequences(X_train, maxlen=self.config.maxlen)
         X_test = sequence.pad_sequences(X_test, maxlen=self.config.maxlen)
