@@ -67,21 +67,22 @@ class CNNTuner():
 
         model.add(Embedding(config.vocab_size, config.embedding_dims, input_length=config.maxlen))
 
-        for i in range(hp.Int('conv_blocks', 2, 8)):
-            model.add(Conv1D(filters=32, kernel_size=3, activation='relu'))
+        for i in range(hp.Int('n_conv_layers', 1, 5)):
+            model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
             model.add(Dropout(0.1))
-            model.add(MaxPooling1D(pool_size=2))
-
+            if i < 3: model.add(MaxPooling1D(pool_size=2))
+        
+        model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
         model.add(Dropout(0.1))
 
         model.add(Flatten())
-        model.add(Dense(128, activation='relu'))
-        model.add(Dropout(0.5))
+
+        for i in range(hp.Int('n_dense_layers', 1, 3)):
+            model.add(Dense(256, activation='relu'))
+            model.add(Dropout(0.5))
 
         model.add(Dense(self.n_labels, activation='softmax'))
-        model.compile(loss=config.lossfunc,
-                      optimizer=tf.keras.optimizers.Adam(hp.Float('learning_rate', 1e-4, 1e-2, sampling='log')),
-                      metrics=['accuracy'])
+        model.compile(loss=config.lossfunc, optimizer=Adam(hp.Choice('learning_rate', values=[0.01, 0.001, 0.0001, 0.00001])), metrics=['accuracy'])
 
         # print(model.summary())
 
@@ -100,7 +101,7 @@ class CNNTuner():
                      y=y_train,
                      epochs=self.config.epochs,
                      batch_size=self.config.batch_size,
-                     verbose=0,
+                     verbose=1,
                      validation_data=(X_val, y_val),
                      callbacks=[EarlyStopping('val_accuracy', patience=6)])
         
