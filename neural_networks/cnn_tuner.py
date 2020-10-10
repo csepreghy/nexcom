@@ -102,7 +102,7 @@ class CNNTuner():
                      y=y_train,
                      epochs=self.config.epochs,
                      batch_size=self.config.batch_size,
-                     verbose=0,
+                     verbose=1,
                      validation_data=(X_val, y_val),
                      callbacks=[EarlyStopping('val_accuracy', patience=6)])
         
