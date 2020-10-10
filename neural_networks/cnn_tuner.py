@@ -92,16 +92,16 @@ class CNNTuner():
         tuner = kt.Hyperband(self._build_model,
                              objective='val_accuracy',
                              max_epochs=30,
-                             hyperband_iterations=50,
+                             hyperband_iterations=2,
                              project_name='cnn-tuner')
         
         tuner.search_space_summary()
     
         tuner.search(x=X_train,
                      y=y_train,
-                     epochs=self.config.epochs,
+                     epochs=40,
                      batch_size=self.config.batch_size,
-                     verbose=1,
+                     verbose=0,
                      validation_data=(X_val, y_val),
                      callbacks=[EarlyStopping('val_accuracy', patience=6)])
         
