@@ -68,7 +68,7 @@ class CNNTuner():
         model.add(Embedding(config.vocab_size, config.embedding_dims, input_length=config.maxlen))
 
         for i in range(hp.Int('n_conv_layers', 1, 5)):
-            model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
+            model.add(Conv1D(filters=hp.Choice('n_filters', values=[32, 64, 128, 256, 512]), kernel_size=3, activation='relu'))
             model.add(Dropout(0.1))
             if i < 3: model.add(MaxPooling1D(pool_size=2))
         
@@ -78,7 +78,7 @@ class CNNTuner():
         model.add(Flatten())
 
         for i in range(hp.Int('n_dense_layers', 1, 3)):
-            model.add(Dense(256, activation='relu'))
+            model.add(Dense(hp.Choice('n_dense_neurones', values=[32, 64, 128, 256, 512]), activation='relu'))
             model.add(Dropout(0.5))
 
         model.add(Dense(self.n_labels, activation='softmax'))
@@ -91,7 +91,7 @@ class CNNTuner():
     def fit(self, X_train, X_test, X_val, y_train, y_test, y_val):
         tuner = RandomSearch(self._build_model,
                              objective='val_accuracy',
-                             max_trials=20,
+                             max_trials=self.config.max_tuner_trials,
                              executions_per_trial=1,
                              directory='logs/keras-tuner/',
                              project_name='cnn-tuner')

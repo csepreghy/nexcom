@@ -8,3 +8,4 @@ lossfunc = 'categorical_crossentropy'
 logpath = 'logs'
 epochs = 10
 lstm_gpu = False
+max_tuner_trials = 50
