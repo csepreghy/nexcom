@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 import pickle
 
+from tensorflow.keras.callbacks import Callback
 from sklearn.metrics import f1_score, recall_score, precision_score, classification_report
 
 def shuffle_in_unison(a, b):
@@ -42,3 +43,8 @@ def save_accuracies(history):
     with open ('cnn_accuracies.pkl', 'rb') as f:
         accuracies = pickle.load(f)
         print(f'accuracies : {accuracies}')
+
+
+class PrintTestAccuracy(Callback):
+    def on_test_batch_end(self, batch, logs=None):
+        print('test accuracy: ', logs['accuracy'][0])

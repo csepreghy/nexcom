@@ -19,8 +19,8 @@ def run_lstm(df):
 
 def run_cnn_tuner(df):
     cnn_tuner = CNNTuner(config)
-    X_train, X_test, X_val, y_train, y_test, y_val = cnn_tuner.prepare_data(df)
-    model = cnn_tuner.fit(X_train, X_test, X_val, y_train, y_test, y_val)
+    X_train, X_test, y_train, y_test = cnn_tuner.prepare_data(df)
+    model = cnn_tuner.fit(X_train, X_test, y_train, y_test)
     evaluate_model(model, X_train, y_train, X_test, y_test)
 
 if __name__ == '__main__':

@@ -6,6 +6,6 @@ filters = 16
 kernel_size = 3
 lossfunc = 'categorical_crossentropy'
 logpath = 'logs'
-epochs = 10
+epochs = 2
 lstm_gpu = False
 max_tuner_trials = 50
