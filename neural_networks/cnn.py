@@ -95,7 +95,7 @@ class CNN():
                             batch_size=self.config.batch_size,
                             epochs=self.config.epochs,
                             validation_split=0.2,
-                            verbose=2
+                            verbose=2,
                             callbacks=[callbacks])
         
 
