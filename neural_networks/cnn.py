@@ -23,30 +23,24 @@ class CNN():
         X = data['Subject']
         y = np.array(data['Tray']).reshape(-1, 1)
 
-        print(f'X[0:5] = {X[0:5]}')
-        X, y = shuffle_in_unison(X, y)
-        print(f'X[0:5] = {X[0:5]}')
-
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
         X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2)
 
         tokenizer = text.Tokenizer(num_words=self.config.vocab_size)
         tokenizer.fit_on_texts(X_train)
 
-        X_train = tokenizer.texts_to_sequences(X_train)
-        X_test = tokenizer.texts_to_sequences(X_test)
-        X_val = tokenizer.texts_to_sequences(X_val)
+        X_train = tokenizer.texts_to_matrix(X_train)
+        X_test = tokenizer.texts_to_matrix(X_test)
+        X_val = tokenizer.texts_to_matrix(X_val)
 
         X_train = sequence.pad_sequences(X_train, maxlen=self.config.maxlen)
         X_test = sequence.pad_sequences(X_test, maxlen=self.config.maxlen)
-        X_val = sequence.pad_sequences(X_val, maxlen=self.config.maxlen)
         
         self.enc = OneHotEncoder(handle_unknown='ignore')
         self.enc.fit(y_train)
 
         y_train = self.enc.transform(y_train).toarray()
         y_test = self.enc.transform(y_test).toarray()
-        y_val = self.enc.transform(y_val).toarray()
 
         # print(self.enc.categories_)
         
@@ -55,30 +49,26 @@ class CNN():
 
         X_train = np.expand_dims(X_train, axis=2)
         X_test = np.expand_dims(X_test, axis=2)
-        X_val = np.expand_dims(X_val, axis=2)
 
-        return X_train, X_test, X_val, y_train, y_test, y_val
+        return X_train, X_test, y_train, y_test
 
     def _build_model(self, config):
         model = Sequential()
 
         model.add(Embedding(config.vocab_size, config.embedding_dims, input_length=config.maxlen))
 
-        model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
-        model.add(Dropout(0.1))
+        model.add(Conv1D(filters=128, kernel_size=3, activation='relu'))
+        model.add(Dropout(0.2))
         model.add(MaxPooling1D(pool_size=2))
-        model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
-        model.add(Dropout(0.1))
-        model.add(MaxPooling1D(pool_size=2))
-        model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
-        model.add(Dropout(0.1))
+        model.add(Conv1D(filters=128, kernel_size=3, activation='relu'))
+        model.add(Dropout(0.2))
 
         model.add(Flatten())
 
-        model.add(Dense(256, activation='relu'))
-        model.add(Dropout(0.5))
         model.add(Dense(128, activation='relu'))
-        model.add(Dropout(0.5))
+        model.add(Dropout(0.6))
+        model.add(Dense(128, activation='relu'))
+        model.add(Dropout(0.6))
 
         model.add(Dense(self.n_labels, activation='softmax'))
         model.compile(loss=config.lossfunc, optimizer=Adam(0.0001), metrics=['accuracy'])
@@ -104,16 +94,13 @@ class CNN():
         history = model.fit(X_train, y_train,
                             batch_size=self.config.batch_size,
                             epochs=self.config.epochs,
-                            validation_data=(X_val, y_val), callbacks=[callbacks])
+                            validation_split=0.2,
+                            verbose=2
+                            callbacks=[callbacks])
         
-        with open('cnn_accuracies.pkl', 'wb') as f:
-            accuracies = history.history['accuracy']
-            print(f'accuracies : {accuracies}')
-            pickle.dump(history.history['accuracy'], f)
-        
-        with open ('cnn_accuracies.pkl', 'rb') as f:
-            accuracies = pickle.load(f)
-            print(f'accuracies : {accuracies}')
+
+        accuracies = history.history['accuracy']
+        print(f'accuracies : {accuracies}')
 
         return model
         

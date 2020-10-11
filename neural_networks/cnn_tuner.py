@@ -59,21 +59,21 @@ class CNNTuner():
         model.add(Embedding(config.vocab_size, config.embedding_dims, input_length=config.maxlen))
 
         for i in range(hp.Int('n_conv_layers', 1, 5)):
-            model.add(Conv1D(filters=hp.Choice('n_filters', values=[32, 64, 128, 256, 512]), kernel_size=3, activation='relu'))
-            model.add(Dropout(hp.Choice('conv_dropout', values=[0.0, 0.1, 0.2, 0.3])))
+            model.add(Conv1D(filters=hp.Choice('n_filters', values=[64, 128, 256, 512], default=128), kernel_size=3, activation='relu'))
+            model.add(Dropout(hp.Choice('conv_dropout', values=[0.0, 0.1, 0.2, 0.3], default=0.2)))
             if i < 3: model.add(MaxPooling1D(pool_size=2))
         
         model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
-        model.add(Dropout(hp.Choice('conv_dropout', values=[0.0, 0.1, 0.2, 0.3])))
+        model.add(Dropout(hp.Choice('conv_dropout', values=[0.0, 0.1, 0.2, 0.3], default=0.2)))
 
         model.add(Flatten())
 
         for i in range(hp.Int('n_dense_layers', 1, 3)):
-            model.add(Dense(hp.Choice('n_dense_neurones', values=[32, 64, 128, 256, 512]), activation='relu'))
+            model.add(Dense(hp.Choice('n_dense_neurones', values=[64, 128, 256, 512], default=128), activation='relu'))
             model.add(Dropout(hp.Choice('dense_dropout', values=[0.0, 0.1, 0.2, 0.4, 0.5, 0.6])))
 
         model.add(Dense(self.n_labels, activation='softmax'))
-        model.compile(loss=config.lossfunc, optimizer=Adam(hp.Choice('learning_rate', values=[0.01, 0.001, 0.0001, 0.00001])), metrics=['accuracy'])
+        model.compile(loss=config.lossfunc, optimizer=Adam(hp.Choice('learning_rate', values=[0.001, 0.0001, 0.00001], default=0.0001)), metrics=['accuracy'])
 
         # print(model.summary())
 
@@ -97,7 +97,7 @@ class CNNTuner():
                      verbose=0,
                      validation_split=0.2,
                      callbacks=[EarlyStopping('val_accuracy', patience=6)])
-
+        print('Final Results')
         print(tuner.results_summary())
         model = tuner.get_best_models(num_models=1)[0]
         print(model.summary())
