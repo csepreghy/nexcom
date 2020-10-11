@@ -47,4 +47,4 @@ def save_accuracies(history):
 
 class PrintTestAccuracy(Callback):
     def on_test_batch_end(self, batch, logs=None):
-        print('test accuracy: ', logs['accuracy'])
+        pass

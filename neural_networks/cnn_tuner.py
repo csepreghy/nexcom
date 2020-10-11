@@ -96,7 +96,7 @@ class CNNTuner():
                      batch_size=self.config.batch_size,
                      verbose=0,
                      validation_split=0.2,
-                     callbacks=[EarlyStopping('val_accuracy', patience=6), PrintTestAccuracy()])
+                     callbacks=[EarlyStopping('val_accuracy', patience=6)])
 
         print(tuner.results_summary())
         model = tuner.get_best_models(num_models=1)[0]
