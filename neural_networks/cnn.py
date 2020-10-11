@@ -57,8 +57,6 @@ class CNN():
 
         model.add(Embedding(config.vocab_size, config.embedding_dims, input_length=config.maxlen))
 
-        model.add(Conv1D(filters=128, kernel_size=3, activation='relu'))
-        model.add(Dropout(0.2))
         model.add(MaxPooling1D(pool_size=2))
         model.add(Conv1D(filters=128, kernel_size=3, activation='relu'))
         model.add(Dropout(0.2))
@@ -67,8 +65,6 @@ class CNN():
 
         model.add(Flatten())
 
-        model.add(Dense(256, activation='relu'))
-        model.add(Dropout(0.5))
         model.add(Dense(128, activation='relu'))
         model.add(Dropout(0.5))
 
