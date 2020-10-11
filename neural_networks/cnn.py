@@ -77,7 +77,7 @@ class CNN():
     
     def _get_callbacks(self, config):
         now = datetime.datetime.now()
-        earlystopping = EarlyStopping(monitor='accuracy', patience=15)
+        earlystopping = EarlyStopping(monitor='val_loss', patience=10)
         modelcheckpoint = ModelCheckpoint(filepath=f'{config.logpath}' + '/model/cnn.epoch{epoch:02d}-val_loss_{val_loss:.2f}.h5',
                                           monitor='val_loss',
                                           save_best_only=True)
