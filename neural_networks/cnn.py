@@ -62,13 +62,15 @@ class CNN():
         model.add(MaxPooling1D(pool_size=2))
         model.add(Conv1D(filters=128, kernel_size=3, activation='relu'))
         model.add(Dropout(0.2))
+        model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
+        model.add(Dropout(0.2))
 
         model.add(Flatten())
 
+        model.add(Dense(256, activation='relu'))
+        model.add(Dropout(0.5))
         model.add(Dense(128, activation='relu'))
-        model.add(Dropout(0.6))
-        model.add(Dense(128, activation='relu'))
-        model.add(Dropout(0.6))
+        model.add(Dropout(0.5))
 
         model.add(Dense(self.n_labels, activation='softmax'))
         model.compile(loss=config.lossfunc, optimizer=Adam(0.0001), metrics=['accuracy'])
