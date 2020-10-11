@@ -86,7 +86,7 @@ class CNN():
         
         return [earlystopping, modelcheckpoint]
 
-    def fit(self, X_train, X_test, X_val, y_train, y_test):
+    def fit(self, X_train, X_test, y_train, y_test):
         model = self._build_model(self.config)
 
         callbacks = self._get_callbacks(self.config)
