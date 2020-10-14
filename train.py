@@ -7,9 +7,9 @@ from neural_networks.utils import evaluate_model
 
 def run_cnn(df):
     cnn = CNN(config)
-    X_train, X_test, y_train, y_test = cnn.prepare_data(df)
-    model = cnn.fit(X_train, X_test, y_train, y_test)
-    evaluate_model(model, X_train, y_train, X_test, y_test)
+    X_train, y_train = cnn.prepare_data(df)
+    model = cnn.fit(X_train, y_train)
+    # evaluate_model(model, X_train, y_train, X_test, y_test)
 
 def run_lstm(df):
     lstm = LongShortTermMemory(config)

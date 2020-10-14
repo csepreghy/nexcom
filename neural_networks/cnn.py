@@ -3,6 +3,7 @@ import pandas as pd
 import time
 import datetime
 import pickle
+import openpyxl
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
@@ -23,34 +24,59 @@ class CNN():
         X = data['Subject']
         y = np.array(data['Tray']).reshape(-1, 1)
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-        X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.2)
+        X_train, y_train = X, y
 
         tokenizer = text.Tokenizer(num_words=self.config.vocab_size)
         tokenizer.fit_on_texts(X_train)
 
         X_train = tokenizer.texts_to_matrix(X_train)
-        X_test = tokenizer.texts_to_matrix(X_test)
-        X_val = tokenizer.texts_to_matrix(X_val)
-
         X_train = sequence.pad_sequences(X_train, maxlen=self.config.maxlen)
-        X_test = sequence.pad_sequences(X_test, maxlen=self.config.maxlen)
         
         self.enc = OneHotEncoder(handle_unknown='ignore')
         self.enc.fit(y_train)
 
         y_train = self.enc.transform(y_train).toarray()
-        y_test = self.enc.transform(y_test).toarray()
 
-        # print(self.enc.categories_)
+        print(self.enc.categories_)
         
         self.n_labels = y_train.shape[1]
         print(f'Number of labels: {self.n_labels}')
 
         X_train = np.expand_dims(X_train, axis=2)
-        X_test = np.expand_dims(X_test, axis=2)
 
-        return X_train, X_test, y_train, y_test
+
+        return X_train, y_train
+    
+    def predict(self, df_train, df_test, model):
+        y_train = np.array(df_train['Tray']).reshape(-1, 1)
+        enc = OneHotEncoder(handle_unknown='ignore')
+        enc.fit(y_train)
+
+        n_labels = y_train.shape[1]
+        print('self.enc.categories_', enc.categories_)
+        print(f'Number of labels: {n_labels}')
+
+        X = df_test['Subject']
+
+        tokenizer = text.Tokenizer(num_words=self.config.vocab_size)
+        tokenizer.fit_on_texts(X)
+    
+        X = tokenizer.texts_to_matrix(X)
+        X = sequence.pad_sequences(X, maxlen=self.config.maxlen)
+        
+        X_pred = np.expand_dims(X, axis=2)
+
+        y_pred = model.predict(X_pred)
+        print(f'y_pred = {y_pred}')
+
+        predicted_labels = enc.inverse_transform(y_pred)
+        df_test['Tray'] = predicted_labels
+
+        print(f'{df_test}')
+
+        df_test.to_excel('data/results.xlsx')
+
+
 
     def _build_model(self, config, n_labels=None):
         model = Sequential()
@@ -93,7 +119,7 @@ class CNN():
         
         return [earlystopping, modelcheckpoint]
 
-    def fit(self, X_train, X_test, y_train, y_test):
+    def fit(self, X_train, y_train):
         model = self._build_model(self.config)
 
         callbacks = self._get_callbacks(self.config)

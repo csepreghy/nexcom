@@ -3,9 +3,11 @@ from os.path import isfile, join
 import pandas as pd
 import string
 import re
+import xlrd
 
 def load_text(max_len):
-    df = pd.read_csv('data/Exercise STUDENT Training dataset - 1X IRI 7 Oct 20.csv').head(max_len).astype(str)
+    df = pd.read_excel('data/Exercise STUDENT Results dataset - 1X IRI 7 Oct 20.xlsx').astype(str)
+    # df = pd.read_csv('data/Exercise STUDENT Training dataset - 1X IRI 7 Oct 20.csv').head(max_len).astype(str)
     print(f'{df}')
     print(df.Tray.value_counts().tolist())
 
