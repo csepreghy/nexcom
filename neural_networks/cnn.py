@@ -52,33 +52,42 @@ class CNN():
 
         return X_train, X_test, y_train, y_test
 
-    def _build_model(self, config):
+    def _build_model(self, config, n_labels=None):
         model = Sequential()
 
         model.add(Embedding(config.vocab_size, config.embedding_dims, input_length=config.maxlen))
 
         model.add(MaxPooling1D(pool_size=2))
         model.add(Conv1D(filters=128, kernel_size=3, activation='relu'))
-        model.add(Dropout(0.2))
-        model.add(Conv1D(filters=64, kernel_size=3, activation='relu'))
+
+        model.add(Dropout(0))
+        model.add(Conv1D(filters=128, kernel_size=3, activation='relu'))
         model.add(Dropout(0.2))
 
         model.add(Flatten())
 
-        model.add(Dense(128, activation='relu'))
-        model.add(Dropout(0.5))
+        model.add(Dense(512, activation='relu'))
+        model.add(Dropout(0.4))
+        
+        model.add(Dense(512, activation='relu'))
+        model.add(Dropout(0.4))
 
-        model.add(Dense(self.n_labels, activation='softmax'))
-        model.compile(loss=config.lossfunc, optimizer=Adam(0.0001), metrics=['accuracy'])
+        if n_labels is not None:
+            model.add(Dense(n_labels, activation='softmax'))
 
-        # print(model.summary())
+        else:
+            model.add(Dense(self.n_labels, activation='softmax'))
+
+        model.compile(loss=config.lossfunc, optimizer=Adam(0.001), metrics=['accuracy'])
+
+        print(model.summary())
 
         return model
     
     def _get_callbacks(self, config):
         now = datetime.datetime.now()
-        earlystopping = EarlyStopping(monitor='val_loss', patience=10)
-        modelcheckpoint = ModelCheckpoint(filepath=f'{config.logpath}' + '/model/cnn.epoch{epoch:02d}-val_loss_{val_loss:.2f}.h5',
+        earlystopping = EarlyStopping(monitor='val_loss', patience=6)
+        modelcheckpoint = ModelCheckpoint(filepath=f'{config.logpath}' + '/model/cnn.epoch{epoch:02d}-val_loss_{val_loss:.2f}' + f'-labels-{self.n_labels}' + '.h5',
                                           monitor='val_loss',
                                           save_best_only=True)
         
@@ -92,13 +101,19 @@ class CNN():
         history = model.fit(X_train, y_train,
                             batch_size=self.config.batch_size,
                             epochs=self.config.epochs,
-                            validation_split=0.2,
-                            verbose=2,
+                            validation_split=0.1,
+                            verbose=1,
                             callbacks=[callbacks])
         
 
         accuracies = history.history['accuracy']
         print(f'accuracies : {accuracies}')
+
+        return model
+    
+    def load(self, path, n_labels):
+        model = self._build_model(self.config, n_labels)
+        model.load_weights(path)
 
         return model
         

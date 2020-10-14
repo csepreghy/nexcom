@@ -7,7 +7,7 @@ import re
 def load_text(max_len):
     df = pd.read_csv('data/Exercise STUDENT Training dataset - 1X IRI 7 Oct 20.csv').head(max_len).astype(str)
     print(f'{df}')
-    print(df.Tray.value_counts())
+    print(df.Tray.value_counts().tolist())
 
     return df
 
